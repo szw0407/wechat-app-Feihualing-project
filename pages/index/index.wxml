@@ -25,7 +25,7 @@
     
     <view wx:elif="{{searchResults.length > 0}}" class="results">
       <view class="result-header">
-        <text class="result-title">找到 {{searchResults.length}} 条包含"{{searchChar}}"的诗句</text>
+        <text class="result-title">找到 {{searchResults.length}} 条包含"{{lastSearchedChar}}"的诗句</text>
         <button class="copy-btn" bindtap="copyResults">复制结果</button>
       </view>
       
@@ -36,7 +36,7 @@
     </view>
     
     <view wx:elif="{{hasSearched}}" class="no-result">
-      <text>未找到包含"{{searchChar}}"的诗句</text>
+      <text>未找到包含"{{lastSearchedChar}}"的诗句</text>
     </view>
     
     <!-- 设置区域 -->
