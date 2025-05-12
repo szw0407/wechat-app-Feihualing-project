@@ -115,7 +115,7 @@ function parsePoems() {
 /**
  * 根据关键字搜索诗句
  * @param {string} keyword 搜索关键字，单个汉字
- * @returns {Array} 匹配的诗句数组，每项包含{line, author, title, source}
+ * @returns {Array} 匹配的诗句数组，每项包含{line, author, title, source, charIndices}
  */
 function searchPoemsByChar(keyword) {
   if (!keyword || keyword.length !== 1) {
@@ -128,11 +128,20 @@ function searchPoemsByChar(keyword) {
   poems.forEach(poem => {
     poem.content.forEach(line => {
       if (line.includes(keyword)) {
+        // 找出关键字在诗句中所有出现的位置
+        const charIndices = [];
+        let pos = line.indexOf(keyword);
+        while (pos !== -1) {
+          charIndices.push(pos);
+          pos = line.indexOf(keyword, pos + 1);
+        }
+        
         results.push({
           line: line,
           author: poem.author,
           title: poem.title,
-          source: poem.source
+          source: poem.source,
+          charIndices: charIndices // 添加字符匹配的所有位置信息
         });
       }
     });

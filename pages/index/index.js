@@ -237,35 +237,6 @@ Page({
   },
   
   /**
-   * 复制搜索结果
-   */
-  copyResults() {
-    const { searchResults, lastSearchedChar } = this.data;
-    
-    if (searchResults.length === 0) {
-      return;
-    }
-    
-    // 格式化要复制的文本
-    let copyText = `【飞花令】含"${lastSearchedChar}"的诗句：\n\n`;
-    
-    searchResults.forEach((item, index) => {
-      copyText += `${index + 1}. ${item.line}\n   ——${item.author}《${item.title}》\n\n`;
-    });
-    
-    // 复制到剪贴板
-    wx.setClipboardData({
-      data: copyText,
-      success: () => {
-        wx.showToast({
-          title: '已复制到剪贴板',
-          icon: 'success'
-        });
-      }
-    });
-  },
-  
-  /**
    * 显示数据更新选项弹窗
    */
   showDataUpdateOptions() {

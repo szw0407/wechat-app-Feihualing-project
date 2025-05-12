@@ -29,8 +29,51 @@
         <button class="copy-btn" bindtap="copyResults">复制结果</button>
       </view>
       
+      <wxs module="poemUtils">
+  function processLine(line, indices, keyword) {
+    if (!indices || indices.length === 0) return [{ text: line, highlight: false }];
+    
+    var result = [];
+    var lastIndex = 0;
+    
+    for (var i = 0; i < indices.length; i++) {
+      // 添加当前匹配前的文本
+      if (indices[i] > lastIndex) {
+        result.push({
+          text: line.substring(lastIndex, indices[i]),
+          highlight: false
+        });
+      }
+      
+      // 添加高亮的字符
+      result.push({
+        text: keyword,
+        highlight: true
+      });
+      
+      lastIndex = indices[i] + 1;
+    }
+    
+    // 添加最后一个匹配后的文本
+    if (lastIndex < line.length) {
+      result.push({
+        text: line.substring(lastIndex),
+        highlight: false
+      });
+    }
+    
+    return result;
+  }
+  
+  module.exports.processLine = processLine;
+</wxs>
+
       <view class="poem-item" wx:for="{{searchResults}}" wx:key="index">
-        <text class="poem-line">{{item.line}}</text>
+        <view class="poem-line">
+          <block wx:for="{{poemUtils.processLine(item.line, item.charIndices, lastSearchedChar)}}" wx:for-item="part" wx:key="index">
+            <text class="{{part.highlight ? 'highlighted-char' : ''}}">{{part.text}}</text>
+          </block>
+        </view>
         <text class="poem-source">——{{item.author}}《{{item.title}}》</text>
       </view>
     </view>
