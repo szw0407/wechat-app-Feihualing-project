@@ -463,5 +463,50 @@ Page({
         console.error('选择文件失败:', res);
       }
     });
+  },
+
+  /**
+   * 重置数据到初始状态（空）
+   */
+  resetToDefault() {
+    wx.showModal({
+      title: '重置数据确认',
+      content: '确定要重置数据到初始状态吗？',
+      success: (res) => {
+        if (res.confirm) {
+          // 删除本地存储的诗词数据
+          wx.removeStorageSync('poemData');
+          
+          // 初始化数据
+          initPoemDataInfo();
+          
+          // 重新加载数据版本信息
+          this.loadDataInfo();
+          
+          // 清空搜索结果和搜索历史
+          this.setData({
+            searchResults: [],
+            hasSearched: false,
+            searchHistory: []
+          });
+          
+          wx.showToast({
+            title: '数据已重置',
+            icon: 'success',
+            duration: 1000
+          });
+        }
+      }
+    });
+    // force reload the app totally
+    // wx.reLaunch({
+    //   url : '/pages/index/index',
+    //   success: () => {
+    //     console.log('App reloaded');
+    //   },
+    //   fail: (error) => {
+    //     console.error('Failed to reload app:', error);
+    //   }
+    // });
   }
-})
+});

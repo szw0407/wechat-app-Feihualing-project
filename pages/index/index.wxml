@@ -125,6 +125,11 @@
         <text class="option-title">从本地文件导入</text>
         <button class="option-btn" bindtap="chooseLocalFile">选择文件</button>
       </view>
+      <view>
+        <text class="option-title">重置默认数据</text>
+        <text class="option-desc">将数据重置为默认状态</text>
+        <button class="option-btn" bindtap="resetToDefault">重置</button>
+      </view>
     </view>
   </view>
 </view>
