@@ -35,14 +35,7 @@ App({
       }
       
       // 从小程序包内读取shi300.txt文件（注意：在微信小程序中，要读取小程序包内的文件，需要使用相对路径且不带前导斜杠）
-      const fileContent = fs.readFileSync('shi300.txt', 'utf-8');
       
-      // 将内容写入到用户目录
-      fs.writeFileSync(
-        targetPath,
-        fileContent,
-        'utf-8'
-      );
       
       console.log('诗词文件已成功复制到临时目录');
       

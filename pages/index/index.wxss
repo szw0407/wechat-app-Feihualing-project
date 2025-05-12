@@ -283,8 +283,6 @@ page {
   box-sizing: border-box;
   margin-top: 10rpx;
 }
-  margin-top: 200px;
-}
 
 .avatar-wrapper {
   padding: 0;
