@@ -9,6 +9,7 @@
     <view class="search-box">
       <input class="search-input" placeholder="请输入汉字(将查询首字)" bindinput="onSearchInput" value="{{searchChar}}" />
       <button class="search-btn" bindtap="onSearch">查询</button>
+      <button class="clear-btn" bindtap="clearSearch">清空</button>
     </view>
     
     <!-- 历史搜索 -->

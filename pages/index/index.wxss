@@ -59,11 +59,26 @@ page {
   margin-left: 20rpx;
   height: 80rpx;
   line-height: 80rpx;
-  padding: 0 40rpx;
+  padding: 0 28rpx;
   background: #8B4513;
   color: white;
-  font-size: 32rpx;
+  font-size: 30rpx;
   border-radius: 8rpx;
+  min-width: 100rpx;
+  max-width: 150rpx;
+}
+
+.clear-btn {
+  margin-left: 20rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 20rpx;
+  background: #cab38f;
+  color: white;
+  font-size: 30rpx;
+  border-radius: 8rpx;
+  min-width: 100rpx;
+  max-width: 150rpx;
 }
 
 .loading {

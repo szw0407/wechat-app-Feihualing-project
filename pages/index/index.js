@@ -227,12 +227,21 @@ Page({
   /**
    * 点击历史搜索标签
    */
-  onHistoryTagTap(e) {
-    const char = e.currentTarget.dataset.char;
+  /**
+   * 清空搜索结果和搜索框
+   */
+  clearSearch() {
     this.setData({
-      searchChar: char
-    }, () => {
-      this.onSearch();
+      searchChar: '',
+      searchResults: [],
+      hasSearched: false,
+      lastSearchedChar: ''
+    });
+    
+    wx.showToast({
+      title: '已清空',
+      icon: 'success',
+      duration: 1000
     });
   },
   
