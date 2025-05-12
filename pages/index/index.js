@@ -1,5 +1,11 @@
 // index.js
-const { searchPoemsByChar } = require('../../utils/poem');
+const { 
+  searchPoemsByChar, 
+  updatePoemDataFromUrl, 
+  importPoemDataFromFile, 
+  getPoemDataInfo,
+  DEFAULT_POEM_DATA_URL
+} = require('../../utils/poem');
 
 // 最大历史记录数量
 const MAX_HISTORY_SIZE = 6;
@@ -11,6 +17,10 @@ Page({
     loading: false, // 加载状态
     hasSearched: false, // 是否已进行搜索
     searchHistory: [], // 搜索历史
+    showUpdateModal: false, // 是否显示数据更新弹窗
+    updateUrl: '', // 自定义更新URL
+    dataVersion: '', // 数据版本
+    dataSource: '', // 数据来源
   },
   
   /**
@@ -22,6 +32,20 @@ Page({
     
     // 加载历史搜索记录
     this.loadSearchHistory();
+    
+    // 加载数据版本信息
+    this.loadDataInfo();
+  },
+  
+  /**
+   * 加载数据版本信息
+   */
+  loadDataInfo() {
+    const { version, source } = getPoemDataInfo();
+    this.setData({
+      dataVersion: version,
+      dataSource: source
+    });
   },
   
   /**
@@ -178,16 +202,224 @@ Page({
         });
       }
     });
-  }
-    wx.getUserProfile({
-      desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-      success: (res) => {
-        console.log(res)
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-      }
-    })
   },
+  
+  /**
+   * 点击历史搜索标签
+   */
+  onHistoryTagTap(e) {
+    const char = e.currentTarget.dataset.char;
+    this.setData({
+      searchChar: char
+    }, () => {
+      this.onSearch();
+    });
+  },
+  
+  /**
+   * 复制搜索结果
+   */
+  copyResults() {
+    const { searchResults, searchChar } = this.data;
+    
+    if (searchResults.length === 0) {
+      return;
+    }
+    
+    // 格式化要复制的文本
+    let copyText = `【飞花令】含"${searchChar}"的诗句：\n\n`;
+    
+    searchResults.forEach((item, index) => {
+      copyText += `${index + 1}. ${item.line}\n   ——${item.author}《${item.title}》\n\n`;
+    });
+    
+    // 复制到剪贴板
+    wx.setClipboardData({
+      data: copyText,
+      success: () => {
+        wx.showToast({
+          title: '已复制到剪贴板',
+          icon: 'success'
+        });
+      }
+    });
+  },
+  
+  /**
+   * 显示数据更新选项弹窗
+   */
+  showDataUpdateOptions() {
+    this.setData({
+      showUpdateModal: true,
+      updateUrl: ''
+    });
+  },
+  
+  /**
+   * 隐藏弹窗
+   */
+  hideModal() {
+    this.setData({
+      showUpdateModal: false
+    });
+  },
+  
+  /**
+   * 自定义URL输入处理
+   */
+  onUrlInput(e) {
+    this.setData({
+      updateUrl: e.detail.value
+    });
+  },
+  
+  /**
+   * 从默认URL更新数据
+   */
+  updateFromDefaultUrl() {
+    wx.showModal({
+      title: '数据更新确认',
+      content: '确定从默认数据源更新诗词库吗？',
+      success: (res) => {
+        if (res.confirm) {
+          updatePoemDataFromUrl()
+            .then(result => {
+              // 隐藏弹窗
+              this.setData({
+                showUpdateModal: false
+              });
+              
+              // 更新数据版本信息
+              this.setData({
+                dataVersion: result.version,
+                dataSource: result.source,
+                searchResults: [], // 清空当前搜索结果
+                hasSearched: false // 重置搜索状态
+              });
+              
+              wx.showModal({
+                title: '数据更新成功',
+                content: '已从默认数据源更新诗词库',
+                showCancel: false
+              });
+            })
+            .catch(error => {
+              wx.showModal({
+                title: '数据更新失败',
+                content: error.error || '请检查网络连接',
+                showCancel: false
+              });
+            });
+        }
+      }
+    });
+  },
+  
+  /**
+   * 从自定义URL更新数据
+   */
+  updateFromCustomUrl() {
+    const { updateUrl } = this.data;
+    
+    if (!updateUrl || updateUrl.trim() === '') {
+      wx.showToast({
+        title: '请输入有效的URL',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    wx.showModal({
+      title: '数据更新确认',
+      content: '确定从自定义URL更新诗词库吗？',
+      success: (res) => {
+        if (res.confirm) {
+          updatePoemDataFromUrl(updateUrl)
+            .then(result => {
+              // 隐藏弹窗
+              this.setData({
+                showUpdateModal: false
+              });
+              
+              // 更新数据版本信息
+              this.setData({
+                dataVersion: result.version,
+                dataSource: result.source,
+                searchResults: [], // 清空当前搜索结果
+                hasSearched: false // 重置搜索状态
+              });
+              
+              wx.showModal({
+                title: '数据更新成功',
+                content: '已从自定义URL更新诗词库',
+                showCancel: false
+              });
+            })
+            .catch(error => {
+              wx.showModal({
+                title: '数据更新失败',
+                content: error.error || '请检查URL或网络连接',
+                showCancel: false
+              });
+            });
+        }
+      }
+    });
+  },
+  
+  /**
+   * 选择本地文件导入
+   */
+  chooseLocalFile() {
+    // 选择文件
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      extension: ['txt'],
+      success: (res) => {
+        const tempFilePath = res.tempFiles[0].path;
+        const fileName = res.tempFiles[0].name;
+        
+        wx.showModal({
+          title: '导入确认',
+          content: `确定导入文件"${fileName}"作为诗词库吗？`,
+          success: (modalRes) => {
+            if (modalRes.confirm) {
+              importPoemDataFromFile(tempFilePath)
+                .then(result => {
+                  // 隐藏弹窗
+                  this.setData({
+                    showUpdateModal: false
+                  });
+                  
+                  // 更新数据版本信息
+                  this.setData({
+                    dataVersion: result.version,
+                    dataSource: result.source,
+                    searchResults: [], // 清空当前搜索结果
+                    hasSearched: false // 重置搜索状态
+                  });
+                  
+                  wx.showModal({
+                    title: '导入成功',
+                    content: `已成功导入文件"${fileName}"作为诗词库`,
+                    showCancel: false
+                  });
+                })
+                .catch(error => {
+                  wx.showModal({
+                    title: '导入失败',
+                    content: error.error || '文件格式可能不正确',
+                    showCancel: false
+                  });
+                });
+            }
+          }
+        });
+      },
+      fail: (res) => {
+        console.error('选择文件失败:', res);
+      }
+    });
+  }
 })

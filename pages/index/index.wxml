@@ -39,13 +39,42 @@
       <text>未找到包含"{{searchChar}}"的诗句</text>
     </view>
     
+    <!-- 设置区域 -->
+    <view class="settings">
+      <button class="settings-btn" bindtap="showDataUpdateOptions">数据更新</button>
+    </view>
+    
     <!-- 底部提示 -->
     <view class="footer">
-      <text>数据来源：唐诗三百首</text>
-    </view>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
+      <text>数据来源：{{dataSource || '唐诗三百首'}}</text>
+      <text class="data-version" wx:if="{{dataVersion}}">版本: {{dataVersion}}</text>
     </view>
   </view>
 </scroll-view>
+
+<!-- 数据更新弹窗 -->
+<view class="modal" wx:if="{{showUpdateModal}}">
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">数据更新</text>
+      <text class="modal-close" bindtap="hideModal">×</text>
+    </view>
+    <view class="modal-body">
+      <view class="update-option" bindtap="updateFromDefaultUrl">
+        <text class="option-title">从默认源更新</text>
+        <text class="option-desc">使用官方数据源更新诗词库</text>
+      </view>
+      
+      <view class="update-option">
+        <text class="option-title">从URL更新</text>
+        <input class="url-input" placeholder="请输入数据URL" bindinput="onUrlInput" value="{{updateUrl}}" />
+        <button class="option-btn" bindtap="updateFromCustomUrl">更新</button>
+      </view>
+      
+      <view class="update-option">
+        <text class="option-title">从本地文件导入</text>
+        <button class="option-btn" bindtap="chooseLocalFile">选择文件</button>
+      </view>
+    </view>
+  </view>
+</view>

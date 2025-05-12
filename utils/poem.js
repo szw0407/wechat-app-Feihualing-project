@@ -1,6 +1,16 @@
 // utils/poem.js
 const fs = wx.getFileSystemManager();
 
+// 默认的诗词数据URL
+const DEFAULT_POEM_DATA_URL = 'https://raw.githubusercontent.com/chinese-poetry/chinese-poetry/master/shi/tangshi300.txt';
+
+// 本地诗词数据文件路径
+const LOCAL_POEM_DATA_PATH = `${wx.env.USER_DATA_PATH}/poems_data.txt`;
+
+// 数据版本信息存储键
+const DATA_VERSION_KEY = 'poemDataVersion';
+const DATA_SOURCE_KEY = 'poemDataSource';
+
 /**
  * 解析诗词内容，返回格式化的诗词数据
  * @returns {Array} 解析后的诗词数组，每项包含{title, author, content, source}
@@ -8,7 +18,7 @@ const fs = wx.getFileSystemManager();
 function parsePoems() {
   try {
     // 读取诗词文件
-    const content = fs.readFileSync(`${wx.env.USER_DATA_PATH}/poems_data.txt`, 'utf-8');
+    const content = fs.readFileSync(LOCAL_POEM_DATA_PATH, 'utf-8');
     const lines = content.split('\n');
     
     const poems = [];
@@ -109,11 +119,149 @@ function searchPoemsByChar(keyword) {
       }
     });
   });
-  
-  return results;
+    return results;
+}
+
+/**
+ * 从URL下载诗词数据并保存到本地
+ * @param {string} url 数据URL，如果为空则使用默认URL
+ * @returns {Promise} 返回包含更新结果的Promise
+ */
+function updatePoemDataFromUrl(url = DEFAULT_POEM_DATA_URL) {
+  return new Promise((resolve, reject) => {
+    wx.showLoading({
+      title: '正在下载数据...',
+    });
+    
+    // 发起HTTP请求下载数据
+    wx.request({
+      url: url,
+      success: (res) => {
+        if (res.statusCode === 200 && res.data) {
+          try {
+            // 将数据写入本地文件
+            fs.writeFileSync(
+              LOCAL_POEM_DATA_PATH,
+              res.data,
+              'utf8'
+            );
+            
+            // 保存版本信息和来源信息
+            const now = new Date();
+            const version = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            const source = url === DEFAULT_POEM_DATA_URL ? '官方数据源' : '自定义数据源';
+            
+            wx.setStorageSync(DATA_VERSION_KEY, version);
+            wx.setStorageSync(DATA_SOURCE_KEY, source);
+            
+            wx.hideLoading();
+            resolve({
+              success: true,
+              version,
+              source
+            });
+          } catch (err) {
+            wx.hideLoading();
+            reject({
+              success: false,
+              error: '保存数据失败: ' + err.message
+            });
+          }
+        } else {
+          wx.hideLoading();
+          reject({
+            success: false,
+            error: '下载数据失败: ' + res.statusCode
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        reject({
+          success: false,
+          error: '网络请求失败: ' + err.errMsg
+        });
+      }
+    });
+  });
+}
+
+/**
+ * 从本地文件导入诗词数据
+ * @param {string} tempFilePath 临时文件路径
+ * @returns {Promise} 返回包含更新结果的Promise
+ */
+function importPoemDataFromFile(tempFilePath) {
+  return new Promise((resolve, reject) => {
+    try {
+      // 读取临时文件内容
+      fs.readFile({
+        filePath: tempFilePath,
+        encoding: 'utf8',
+        success: (res) => {
+          try {
+            // 将内容写入到本地诗词数据文件
+            fs.writeFileSync(
+              LOCAL_POEM_DATA_PATH,
+              res.data,
+              'utf8'
+            );
+            
+            // 保存版本信息
+            const now = new Date();
+            const version = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            const source = '本地导入';
+            
+            wx.setStorageSync(DATA_VERSION_KEY, version);
+            wx.setStorageSync(DATA_SOURCE_KEY, source);
+            
+            resolve({
+              success: true,
+              version,
+              source
+            });
+          } catch (err) {
+            reject({
+              success: false,
+              error: '保存数据失败: ' + err.message
+            });
+          }
+        },
+        fail: (err) => {
+          reject({
+            success: false,
+            error: '读取文件失败: ' + err.errMsg
+          });
+        }
+      });
+    } catch (err) {
+      reject({
+        success: false,
+        error: '导入数据失败: ' + err.message
+      });
+    }
+  });
+}
+
+/**
+ * 获取当前诗词数据的版本信息
+ * @returns {object} 包含version和source的对象
+ */
+function getPoemDataInfo() {
+  try {
+    const version = wx.getStorageSync(DATA_VERSION_KEY) || '';
+    const source = wx.getStorageSync(DATA_SOURCE_KEY) || '唐诗三百首';
+    return { version, source };
+  } catch (e) {
+    return { version: '', source: '唐诗三百首' };
+  }
 }
 
 module.exports = {
   parsePoems,
-  searchPoemsByChar
+  searchPoemsByChar,
+  updatePoemDataFromUrl,
+  importPoemDataFromFile,
+  getPoemDataInfo,
+  DEFAULT_POEM_DATA_URL
 };

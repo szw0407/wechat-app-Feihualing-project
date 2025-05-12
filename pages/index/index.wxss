@@ -159,20 +159,130 @@ page {
   text-align: center;
 }
 
+.settings {
+  width: 90%;
+  margin-top: 40rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.settings-btn {
+  font-size: 28rpx;
+  padding: 10rpx 30rpx;
+  background: #f0e6d2;
+  color: #8B4513;
+  border: 1rpx solid #cab38f;
+  border-radius: 30rpx;
+}
+
 .footer {
-  margin-top: 80rpx;
+  margin-top: 40rpx;
   padding: 20rpx;
   color: #cab38f;
   font-size: 24rpx;
   text-align: center;
   width: 100%;
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.usermotto {
+.data-version {
+  margin-top: 10rpx;
+  color: #cab38f;
+  font-size: 20rpx;
+}
+
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 80%;
+  background-color: #f8f3e6;
+  border-radius: 10rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  border-bottom: 1rpx solid #cab38f;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  color: #8B4513;
+  font-weight: bold;
+}
+
+.modal-close {
+  font-size: 40rpx;
+  color: #8B4513;
+  padding: 0 10rpx;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.update-option {
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx dashed #cab38f;
+}
+
+.update-option:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.option-title {
+  display: block;
+  font-size: 32rpx;
+  color: #5a3e2a;
+  margin-bottom: 16rpx;
+}
+
+.option-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #996b4a;
+  margin-bottom: 16rpx;
+}
+
+.option-btn {
+  font-size: 28rpx;
+  padding: 8rpx 24rpx;
+  background: #8B4513;
+  color: white;
+  border-radius: 8rpx;
+  margin-top: 16rpx;
+}
+
+.url-input {
+  background: white;
+  border: 2rpx solid #cab38f;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10rpx;
+}
   margin-top: 200px;
 }
 
