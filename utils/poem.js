@@ -12,6 +12,24 @@ const DATA_VERSION_KEY = 'poemDataVersion';
 const DATA_SOURCE_KEY = 'poemDataSource';
 
 /**
+ * 初始化诗词数据信息
+ * 仅在首次使用时设置默认值，不会覆盖用户已更新的数据
+ */
+function initPoemDataInfo() {
+  try {
+    const existingSource = wx.getStorageSync(DATA_SOURCE_KEY);
+    
+    // 只有在没有来源记录的情况下才设置默认值
+    if (!existingSource) {
+      wx.setStorageSync(DATA_SOURCE_KEY, '唐诗三百首（默认）');
+      console.log('已初始化默认数据来源信息');
+    }
+  } catch (e) {
+    console.error('初始化数据信息失败:', e);
+  }
+}
+
+/**
  * 解析诗词内容，返回格式化的诗词数据
  * @returns {Array} 解析后的诗词数组，每项包含{title, author, content, source}
  */
@@ -34,9 +52,9 @@ function parsePoems() {
           line.includes('目录') || line === '唐诗三百首') {
         continue;
       }
-      
-      // 检测诗词编号和标题行 (如 "001张九龄：感遇四首之一")
-      const poemHeaderMatch = line.match(/^(\d{3})(.+?)：(.+)$/);
+        // 检测诗词编号和标题行 (如 "001张九龄：感遇四首之一")
+      // 增强匹配规则，兼容更多格式
+      const poemHeaderMatch = line.match(/^(\d{3})(.+?)：(.+)$/) || line.match(/^(\d+)[\.、]?\s*(.+?)[：|:]\s*(.+)$/);
       if (poemHeaderMatch) {
         // 保存上一首诗
         if (currentPoem && currentPoem.content.length > 0) {
@@ -250,10 +268,10 @@ function importPoemDataFromFile(tempFilePath) {
 function getPoemDataInfo() {
   try {
     const version = wx.getStorageSync(DATA_VERSION_KEY) || '';
-    const source = wx.getStorageSync(DATA_SOURCE_KEY) || '唐诗三百首';
+    const source = wx.getStorageSync(DATA_SOURCE_KEY) || '唐诗三百首（默认）';
     return { version, source };
   } catch (e) {
-    return { version: '', source: '唐诗三百首' };
+    return { version: '', source: '唐诗三百首（默认）' };
   }
 }
 
@@ -263,5 +281,6 @@ module.exports = {
   updatePoemDataFromUrl,
   importPoemDataFromFile,
   getPoemDataInfo,
+  initPoemDataInfo,
   DEFAULT_POEM_DATA_URL
 };

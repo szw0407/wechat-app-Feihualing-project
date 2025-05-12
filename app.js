@@ -8,8 +8,14 @@ App({
 
     console.log('飞花令应用启动');
     
-    // 复制诗词文件到可访问的临时目录
+    // 引入诗词工具函数
+    const poemUtil = require('./utils/poem');
+    
+    // 复制诗词文件到可访问的临时目录（仅首次启动时）
     this.copyPoemsFile();
+    
+    // 初始化诗词数据信息（仅首次使用时）
+    poemUtil.initPoemDataInfo();
   },
   
   // 复制诗词文件到临时目录，以便正确读取
@@ -22,9 +28,10 @@ App({
       try {
         fs.accessSync(targetPath);
         console.log('诗词文件已存在，无需复制');
-        return; // 文件已存在，不需要复制
+        return; // 文件已存在，不需要复制（保留用户可能已更新的数据）
       } catch (accessErr) {
-        // 文件不存在，需要复制
+        // 文件不存在，需要复制默认数据
+        console.log('初次使用，复制默认诗词数据');
       }
       
       // 从小程序包内的data目录复制文件到用户可访问的临时目录
