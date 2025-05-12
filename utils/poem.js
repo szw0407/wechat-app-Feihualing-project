@@ -2,7 +2,7 @@
 const fs = wx.getFileSystemManager();
 
 // 默认的诗词数据URL
-const DEFAULT_POEM_DATA_URL = 'https://raw.githubusercontent.com/chinese-poetry/chinese-poetry/master/shi/tangshi300.txt';
+const DEFAULT_POEM_DATA_URL = 'https://szw0407.github.io/wechat-app-feihualing-project/shi300.txt';
 
 // 本地诗词数据文件路径
 const LOCAL_POEM_DATA_PATH = `${wx.env.USER_DATA_PATH}/poems_data.txt`;

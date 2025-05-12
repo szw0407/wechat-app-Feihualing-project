@@ -103,9 +103,9 @@ Page({
   onSearchInput(e) {
     // 获取搜索框的输入内容
     const value = e.detail.value;
-    // 只保留一个字符
+    // 允许输入多个字符
     this.setData({
-      searchChar: value.charAt(value.length - 1)
+      searchChar: value
     });
   },
   
@@ -117,11 +117,28 @@ Page({
     
     if (!searchChar || searchChar.trim() === '') {
       wx.showToast({
-        title: '请输入一个汉字',
+        title: '请输入汉字',
         icon: 'none'
       });
       return;
     }
+    
+    // 提取第一个汉字进行查询
+    const firstChar = searchChar.trim().charAt(0);
+    
+    // 校验是否是汉字
+    if (!/[\u4e00-\u9fa5]/.test(firstChar)) {
+      wx.showToast({
+        title: '请输入汉字',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 更新搜索字符为提取的第一个汉字
+    this.setData({
+      searchChar: firstChar
+    });
     
     // 显示加载状态
     this.setData({

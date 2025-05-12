@@ -7,7 +7,7 @@
     </view>
     
     <view class="search-box">
-      <input class="search-input" placeholder="请输入一个汉字" bindinput="onSearchInput" maxlength="1" value="{{searchChar}}" />
+      <input class="search-input" placeholder="请输入汉字(将查询首字)" bindinput="onSearchInput" value="{{searchChar}}" />
       <button class="search-btn" bindtap="onSearch">查询</button>
     </view>
     
