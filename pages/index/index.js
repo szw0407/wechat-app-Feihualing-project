@@ -7,7 +7,7 @@ const {
   initPoemDataInfo,
   DEFAULT_POEM_DATA_URL
 } = require('../../utils/poem');
-
+const { default: defaultPoemData } = require('../../utils/data_default');
 // 最大历史记录数量
 const MAX_HISTORY_SIZE = 6;
 
@@ -475,20 +475,13 @@ Page({
       success: (res) => {
         if (res.confirm) {
           // 删除本地存储的诗词数据
-          wx.removeStorageSync('poemData');
+          const fs = wx.getFileSystemManager();
+          const targetPath = `${wx.env.USER_DATA_PATH}/poems_data.txt`;
+          // 写入默认数据
+          fs.writeFileSync(targetPath, defaultPoemData, "utf-8");
           
           // 初始化数据
           initPoemDataInfo();
-          
-          // 重新加载数据版本信息
-          this.loadDataInfo();
-          
-          // 清空搜索结果和搜索历史
-          this.setData({
-            searchResults: [],
-            hasSearched: false,
-            searchHistory: []
-          });
           
           wx.showToast({
             title: '数据已重置',

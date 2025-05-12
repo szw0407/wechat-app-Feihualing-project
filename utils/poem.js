@@ -22,7 +22,7 @@ function initPoemDataInfo() {
     
     // 只有在没有来源记录的情况下才设置默认值
     if (!existingSource) {
-      wx.setStorageSync(DATA_SOURCE_KEY, '唐诗三百首（默认）');
+      wx.setStorageSync(DATA_SOURCE_KEY, '唐诗三百首（精简版-共50篇）');
       console.log('已初始化默认数据来源信息');
     }
   } catch (e) {
