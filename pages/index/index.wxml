@@ -1,24 +1,48 @@
 <!--index.wxml-->
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
+    <view class="header">
+      <text class="title">飞花令</text>
+      <text class="subtitle">古诗文单字查询</text>
+    </view>
+    
+    <view class="search-box">
+      <input class="search-input" placeholder="请输入一个汉字" bindinput="onSearchInput" maxlength="1" value="{{searchChar}}" />
+      <button class="search-btn" bindtap="onSearch">查询</button>
+    </view>
+    
+    <!-- 历史搜索 -->
+    <view class="history" wx:if="{{searchHistory.length > 0 && !searchResults.length && !loading}}">
+      <text class="history-title">最近搜索</text>
+      <view class="history-tags">
+        <text class="history-tag" wx:for="{{searchHistory}}" wx:key="index" bindtap="onHistoryTagTap" data-char="{{item}}">{{item}}</text>
+      </view>
+    </view>
+    
+    <view wx:if="{{loading}}" class="loading">
+      <text>正在查询...</text>
+    </view>
+    
+    <view wx:elif="{{searchResults.length > 0}}" class="results">
+      <view class="result-header">
+        <text class="result-title">找到 {{searchResults.length}} 条包含"{{searchChar}}"的诗句</text>
+        <button class="copy-btn" bindtap="copyResults">复制结果</button>
+      </view>
+      
+      <view class="poem-item" wx:for="{{searchResults}}" wx:key="index">
+        <text class="poem-line">{{item.line}}</text>
+        <text class="poem-source">——{{item.author}}《{{item.title}}》</text>
+      </view>
+    </view>
+    
+    <view wx:elif="{{hasSearched}}" class="no-result">
+      <text>未找到包含"{{searchChar}}"的诗句</text>
+    </view>
+    
+    <!-- 底部提示 -->
+    <view class="footer">
+      <text>数据来源：唐诗三百首</text>
+    </view>
     </view>
     <view class="usermotto">
       <text class="user-motto">{{motto}}</text>
