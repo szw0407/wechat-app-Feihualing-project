@@ -246,6 +246,48 @@ Page({
   },
   
   /**
+   * 删除单个历史记录
+   */
+  deleteHistoryItem(e) {
+    const index = e.currentTarget.dataset.index;
+    const history = this.data.searchHistory.slice();
+    
+    // 删除指定索引的历史记录
+    history.splice(index, 1);
+    
+    // 保存到本地存储和状态
+    wx.setStorageSync('searchHistory', JSON.stringify(history));
+    this.setData({
+      searchHistory: history
+    });
+  },
+  
+  /**
+   * 清空全部历史记录
+   */
+  clearAllHistory() {
+    wx.showModal({
+      title: '确认清空',
+      content: '确定要清空全部搜索历史吗？',
+      success: (res) => {
+        if (res.confirm) {
+          // 清空历史记录
+          wx.setStorageSync('searchHistory', JSON.stringify([]));
+          this.setData({
+            searchHistory: []
+          });
+          
+          wx.showToast({
+            title: '历史已清空',
+            icon: 'success',
+            duration: 1000
+          });
+        }
+      }
+    });
+  },
+  
+  /**
    * 显示数据更新选项弹窗
    */
   showDataUpdateOptions() {

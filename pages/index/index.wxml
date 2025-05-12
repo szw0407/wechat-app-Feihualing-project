@@ -14,9 +14,15 @@
     
     <!-- 历史搜索 -->
     <view class="history" wx:if="{{searchHistory.length > 0 && !searchResults.length && !loading}}">
-      <text class="history-title">最近搜索</text>
+      <view class="history-header">
+        <text class="history-title">最近搜索</text>
+        <button class="history-clear-btn" bindtap="clearAllHistory">清空历史</button>
+      </view>
       <view class="history-tags">
-        <text class="history-tag" wx:for="{{searchHistory}}" wx:key="index" bindtap="onHistoryTagTap" data-char="{{item}}">{{item}}</text>
+        <view class="history-tag-container" wx:for="{{searchHistory}}" wx:key="index">
+          <text class="history-tag" bindtap="onHistoryTagTap" data-char="{{item}}">{{item}}</text>
+          <text class="history-delete-btn" bindtap="deleteHistoryItem" data-index="{{index}}">×</text>
+        </view>
       </view>
     </view>
     
