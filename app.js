@@ -1,4 +1,9 @@
 // app.js
+
+// 导入常量，与poem.js保持一致
+const DATA_VERSION_KEY = 'poemDataVersion';
+const DATA_SOURCE_KEY = 'poemDataSource';
+
 App({
   onLaunch() {
     // 展示本地存储能力
@@ -34,10 +39,25 @@ App({
         console.log('初次使用，复制默认诗词数据');
       }
       
-      // 从小程序包内读取shi300.txt文件（注意：在微信小程序中，要读取小程序包内的文件，需要使用相对路径且不带前导斜杠）
-      
-      
-      console.log('诗词文件已成功复制到临时目录');
+      // 从小程序包内读取docs/shi300.txt文件（注意：在微信小程序中，要读取小程序包内的文件，需要使用相对路径且不带前导斜杠）
+      try {
+        // 读取原始文件内容
+        const fileContent = fs.readFileSync('docs/shi300.txt', 'utf8');
+        // 写入到用户目录
+        fs.writeFileSync(targetPath, fileContent, 'utf8');
+        console.log('诗词文件已成功复制到临时目录');
+      } catch (copyError) {
+        console.error('复制默认诗词文件失败:', copyError);
+        // 使用备用方案，如果读取docs/shi300.txt失败，尝试直接读取shi300.txt
+        try {
+          const fileContent = fs.readFileSync('shi300.txt', 'utf8');
+          fs.writeFileSync(targetPath, fileContent, 'utf8');
+          console.log('使用备用路径成功复制诗词文件');
+        } catch (backupError) {
+          console.error('备用路径复制也失败:', backupError);
+          throw new Error('无法找到或读取诗词数据文件');
+        }
+      }
       
       // 初次安装时，设置默认的数据版本和来源
       const now = new Date();
@@ -45,8 +65,8 @@ App({
       const source = '唐诗三百首(初始数据)';
       
       try {
-        wx.setStorageSync('poemDataVersion', version);
-        wx.setStorageSync('poemDataSource', source);
+        wx.setStorageSync(DATA_VERSION_KEY, version);
+        wx.setStorageSync(DATA_SOURCE_KEY, source);
       } catch (storageErr) {
         console.error('保存数据信息失败:', storageErr);
       }

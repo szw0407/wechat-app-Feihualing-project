@@ -115,9 +115,9 @@ Page({
   onSearch() {
     const { searchChar } = this.data;
     
-    if (!searchChar || searchChar.trim() === '') {
+    if (!searchChar || searchChar.trim() === '' || searchChar.trim().length > 1) {
       wx.showToast({
-        title: '请输入汉字',
+        title: '请输入一个汉字',
         icon: 'none'
       });
       return;
@@ -148,10 +148,10 @@ Page({
     
     // 执行搜索
     try {
-      const results = searchPoemsByChar(searchChar);
+      const results = searchPoemsByChar(firstChar);
       
       // 保存到搜索历史
-      this.saveSearchHistory(searchChar);
+      this.saveSearchHistory(firstChar);
       
       setTimeout(() => {
         this.setData({
